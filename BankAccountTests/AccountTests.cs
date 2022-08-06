@@ -11,13 +11,19 @@ namespace BankAccount.Tests
     [TestClass()]
     public class AccountTests
     {
+
+
         [TestMethod()]
-        public void Deposit_APositiveAmount_AddToBalanace()
+        [DataRow(100)]
+        [DataRow(.01)]
+        [DataRow(1.99)]
+        [DataRow(9_999.99)]
+        public void Deposit_APositiveAmount_AddToBalanace(double depositAmount)
         {
             Account acc = new Account("J Doe");
-            acc.Deposit(100);
+            acc.Deposit(depositAmount);
 
-            Assert.AreEqual(100, acc.Balance);
+            Assert.AreEqual(depositAmount, acc.Balance);
         }
 
         [TestMethod]
@@ -32,7 +38,21 @@ namespace BankAccount.Tests
             // Act
             double returnValue = acc.Deposit(depositAmount);
 
+            // Assert
             Assert.AreEqual(expectedReturn, returnValue);
+        }
+
+        [TestMethod]
+        [DataRow(-1)]
+        [DataRow(0)]
+        public void Deposit_ZeroOrLess_ThrowsArgumentException(double invalidDepositAmount)
+        {
+            // Arrange
+            Account acc = new("J. Doe");
+
+            // Assert => Act
+            Assert.ThrowsException<ArgumentOutOfRangeException>
+                (() => acc.Deposit(invalidDepositAmount));
         }
     }
 }

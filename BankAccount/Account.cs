@@ -39,6 +39,11 @@ namespace BankAccount
         /// <returns> THe new balance after the deposit </returns>
         public double Deposit(double amt)
         {
+            if (amt <= 0)
+            {
+                throw new ArgumentOutOfRangeException($"The {nameof(amt)} must be more than 0");
+            }
+
             Balance += amt;
             return Balance;
         }
