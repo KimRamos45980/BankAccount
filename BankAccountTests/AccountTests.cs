@@ -24,6 +24,7 @@ namespace BankAccount.Tests
         [DataRow(.01)]
         [DataRow(1.99)]
         [DataRow(9_999.99)]
+        [TestCategory("Deposit")]
         public void Deposit_APositiveAmount_AddToBalanace(double depositAmount)
         {
             acc.Deposit(depositAmount);
@@ -32,6 +33,7 @@ namespace BankAccount.Tests
         }
 
         [TestMethod]
+        [TestCategory("Deposit")]
         public void Deposit_APositiveAmount_ReturnsUpdatedBalance()
         {
             // AAA - Arrange Act Assert
@@ -49,6 +51,7 @@ namespace BankAccount.Tests
         [TestMethod]
         [DataRow(-1)]
         [DataRow(0)]
+        [TestCategory("Deposit")]
         public void Deposit_ZeroOrLess_ThrowsArgumentException(double invalidDepositAmount)
         {
             // Arrange
@@ -60,6 +63,7 @@ namespace BankAccount.Tests
         }
 
         [TestMethod]
+        [TestCategory("Withdrawl")]
         public void Withdraw_PositiveAmount_DecreasesBalance()
         {
             // Arrange
@@ -78,29 +82,69 @@ namespace BankAccount.Tests
         }
 
         [TestMethod]
-        public void Withdraw_PositiveAmount_ReturnsUpdatedBalance()
+        [DataRow(100, 50)]
+        [DataRow(100, .99)]
+        [TestCategory("Withdrawl")]
+        public void Withdraw_PositiveAmount_ReturnsUpdatedBalance(double initialDeposit, double withdrawalAmount)
         {
-            Assert.Fail();
+            double expectedBalance = initialDeposit - withdrawalAmount;
+
+            acc.Deposit(initialDeposit);
+
+            double returnedBalance = acc.Withdraw(withdrawalAmount);
+
+            Assert.AreEqual(expectedBalance, returnedBalance);
         }
 
         [TestMethod]
         [DataRow(0)]
         [DataRow(-.01)]
         [DataRow(-1000)]
-        public void Withdraw_ZeroOrLess_ThrowsArgumentOutOfRangeException()
+        [TestCategory("Withdrawl")]
+        public void Withdraw_ZeroOrLess_ThrowsArgumentOutOfRangeException(double withdrawalAmount)
         {
-            Assert.Fail();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => acc.Withdraw(withdrawalAmount));
         }
 
         [TestMethod]
+        [TestCategory("Withdrawl")]
         public void Withdraw_MoreThanAvailableBalance_ThrowsArgumentException()
         {
-            Assert.Fail();
+            double withdrawalAmount = 1000;
+
+            Assert.ThrowsException<ArgumentException>(() => acc.Withdraw(withdrawalAmount));
         }
 
-        // Withdrawling a positive amount - returns updated balance
-        // Withdrawling 0 - Throws ArgumentOutOfRange exception
-        // Withdrawling negative amount - Throws ArgumentOutOfRange exception
-        // Withdrawling more than balance - ArgumentException
+        [TestMethod]
+        public void Owner_SetAsNull_ThrowsArgumentNullException()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => acc.Owner = null);
+        }
+
+        [TestMethod]
+        public void Owner_SetAsWhiteSpaceOrEmptyString_ThrowsArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = String.Empty);
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = "   ");
+        }
+
+        [TestMethod]
+        [DataRow("Jane")]
+        [DataRow("Jane Doe")]
+        [DataRow("Sarah Victoria Smith")]
+        public void Owner_SetAsUpTo20Character_SetsSuccessfully(string ownerName)
+        {
+            acc.Owner = ownerName;
+            Assert.AreEqual(ownerName, acc.Owner);
+        }
+
+        [TestMethod]
+        [DataRow("Jane1")]
+        [DataRow("Sarah Victoria Smiths")]
+        [DataRow("*&^%")]
+        public void Owner_InvalidOwnerName_ThrowsArgumentException(string ownerName)
+        {
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = ownerName);
+        }
     }
 }
